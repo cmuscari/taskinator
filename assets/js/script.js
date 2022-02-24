@@ -273,6 +273,62 @@ var saveTasks = function() {
 
 
 
+// get task items from local storage
+var loadTasks = function() {
+  var savedTasks = localStorage.getItem("tasks");
+  // if there are no tasks, set tasks to an empty array and return out of the function
+  if (!savedTasks) {
+    return false;
+  }
+
+  // otherwise, load up saved tasks
+  // parse into array of objects
+  savedTasks = JSON.parse(savedTasks);
+
+  // loop through savedTasks array
+  for (var i = 0; i < savedTasks.length; i++) {
+    createTaskEl(savedTasks[i]);
+
+     // create list item
+     var listItemEl = document.createElement("li");
+     listItemEl.className = "task-item";
+
+     // add task id as a data attribute
+     listItemEl.setAttribute("data-task-id", taskIdCounter);
+
+    // create div to hold task info and add to list item
+    var taskInfoEl = document.createElement("div");
+    // give it a class name
+    taskInfoEl.className = "task-info";
+    // add HTML content to div
+    taskInfoEl.innerHTML = "<h3 class='task-name'>" + tasks[i].name + "</h3><span class='task-type'>" + tasks[i].type + "</span>";
+
+     // add task type to task name
+     listItemEl.appendChild(taskInfoEl);
+
+     var taskActionsEl = createTaskActions(tasks[i].id);
+     listItemEl.appendChild(taskActionsEl);
+
+     if (tasks[i].status === "to do") {
+       listItemEl.querySelector("select[name='status-change']").selectedIndex = 0;
+       tasksToDoEl.appendChild(listItemEl);
+     }
+     else if (tasks[i].status === "in progress") {
+      listItemEl.querySelector("select[name='status-change']").selectedIndex = 1;
+      tasksInProgressEl.appendChild(listItemEl);
+     }
+     else if (tasks[i].status === "complete") {
+      listItemEl.querySelector("select[name='status-change']").selectedIndex = 2;
+      tasksCompleteEl.appendChild(listItemEl);
+     }
+
+     taskIdCounter++;
+
+    // pass each task object into the 'createTaskEl()' function
+    createTaskEl(savedTasks[i]);
+  }
+};
+
 
 
 
@@ -280,3 +336,5 @@ var saveTasks = function() {
 formEl.addEventListener("submit", taskFormHandler);
 pageContentEl.addEventListener("click", taskButtonHandler);
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
+
+loadTasks();
